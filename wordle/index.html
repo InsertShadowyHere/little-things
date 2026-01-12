@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wordle!</title>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" href="wordleico.png" type="image/png" />
+  </head>
+  <body>
+    <div class="tab-selector">
+      <button
+        id="daily-tab"
+        class="tab active"
+        onclick="selectTab('daily'); this.blur();"
+      >
+        Daily
+      </button>
+      <button
+        id="infinite-tab"
+        class="tab"
+        onclick="selectTab('infinite'); this.blur();"
+      >
+        Infinite
+      </button>
+    </div>
+    <div id="game-mode-content"></div>
+    <div id="wordle-grid"></div>
+    <button id="reset-button", onclick="closeEnd(); clearInfiniteGame(); resetGame(); generateWord(); this.blur();", hidden>
+      Reset
+    </button>
+    <button onclick="popupStats(); this.blur();">Statistics</button>
+    <br />
+    <button onclick="saveGame(); this.blur();">Save</button>
+    <button onclick="loadGame(); this.blur();">Load</button>
+    <button onclick="clearGame(); this.blur();">Clear</button>
+    <div id="countdown"></div>
+    <div id="splash-text"></div>
+    <div id="words-left"></div>
+    <button id='colorblind-mode' onclick="toggleColorblindMode();">Colorblind Mode OFF</button>
+    <div hidden='true' id='colorblind-indicator'>Correct position: 🟧   Present, but wrong position: 🟦</div>
+    <!-- STATS POPUP FOR INFINITE AND DAILY -->
+    <div class="popup" , id="stats-popup">
+      <div class="popup-content">
+        <u>Lifetime Statistics</u><br />
+        <div class="stats-flex">
+          <div class="stats-daily">
+            DAILY MODE
+            <div id="daily-wins">Wins:</div><br>
+            <div id='daily-graph', class="graph">
+  <div class="graph-row"><span>1</span><div class="bar" id="daily-bar-1"></div></div>
+  <div class="graph-row"><span>2</span><div class="bar" id="daily-bar-2"></div></div>
+  <div class="graph-row"><span>3</span><div class="bar" id="daily-bar-3"></div></div>
+  <div class="graph-row"><span>4</span><div class="bar" id="daily-bar-4"></div></div>
+  <div class="graph-row"><span>5</span><div class="bar" id="daily-bar-5"></div></div>
+  <div class="graph-row"><span>6</span><div class="bar" id="daily-bar-6"></div></div>
+</div>
+            <div id="daily-average"></div><br>
+          </div>
+          <div class="stats-infinite">
+            INFINITE MODE
+            <div id="inf-wins"></div><br>
+            <div id='inf-graph', class="graph">
+  <div class="graph-row"><span>1</span><div class="bar" id="inf-bar-1"></div></div>
+  <div class="graph-row"><span>2</span><div class="bar" id="inf-bar-2"></div></div>
+  <div class="graph-row"><span>3</span><div class="bar" id="inf-bar-3"></div></div>
+  <div class="graph-row"><span>4</span><div class="bar" id="inf-bar-4"></div></div>
+  <div class="graph-row"><span>5</span><div class="bar" id="inf-bar-5"></div></div>
+  <div class="graph-row"><span>6</span><div class="bar" id="inf-bar-6"></div></div>
+</div>
+            <div id="inf-average"></div><br>
+          </div>
+        </div>
+
+        <button onclick="closeStats()">Close</button>
+      </div>
+    </div>
+    <!-- END GAME POPUP -->
+    <div class="popup" id="end-popup">
+      <div class="popup-content">
+        <div id="end-text"><u>Game Over!</u><br /></div>
+        <button onclick="copyEmojis()">Copy Results</button>
+        <button onclick="closeEnd()">Close</button>
+        <button id="reset-button-popup", hidden, onclick="closeEnd(); clearInfiniteGame(); resetGame(); generateWord(); this.blur();">Reset</button>
+        <div id="copy-text"></div>
+      </div>
+    </div>
+    <script src="wordle.js"></script>
+  </body>
+</html>

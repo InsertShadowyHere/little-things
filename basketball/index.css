@@ -1,0 +1,41 @@
+body {
+  font-family: Arial, sans-serif; text-align: center; background: #1a1a1a; color: white;
+}
+
+.container {
+  width: 100%;
+  display: grid;
+  grid-template-areas: "sidebar main";
+  grid-template-columns: 400px auto;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  height: auto;
+  background-color: lightgray;
+}
+
+.main {
+  grid-area: main;
+  height: auto;
+  background-color: rgb(0, 0, 0);
+}
+
+.title {
+  font-size: 28pt; 
+  color: black
+}
+
+.subtitle {
+  font-size: 18px; 
+  color: black;
+  margin-top: -20px;
+}
+
+.description {
+  font-size: 16px; 
+  color: black;
+  margin-top: 50px;
+  margin-left: 20px;
+  margin-right: 20px;
+}

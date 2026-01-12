@@ -1,0 +1,8 @@
+html, body, #map {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.glow-icon {
+  filter: drop-shadow(0 0 5px #00f) drop-shadow(0 0 10px #0ff);
+}

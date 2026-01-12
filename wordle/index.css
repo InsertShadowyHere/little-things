@@ -1,0 +1,87 @@
+#wordle-grid {
+  display: grid;
+  gap: 8px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cell {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  background: #eee;
+}
+.tab-selector {
+  display: flex;
+  margin-bottom: 16px;
+}
+.tab {
+  padding: 8px 16px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 1em;
+  border-bottom: 2px solid transparent;
+}
+.tab.active {
+  background: #fff;
+  border-bottom: 2px solid #333;
+  font-weight: bold;
+}
+.popup {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.popup-content {
+  background: white;
+  padding: 2em;
+  border-radius: 10px;
+  min-width: 300px;
+  text-align: center;
+}
+.stats-flex {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+.stats-daily, .stats-infinite {
+  min-width: 150px;
+}
+.graph {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0;
+}
+.graph-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.graph-row span {
+  width: 12px;
+  text-align: right;
+}
+.bar {
+  background: #a6c935;
+  height: 20px;
+  min-width: 20px;
+  color: white;
+  text-align: right;
+  padding-right: 5px;
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 3px;
+}
