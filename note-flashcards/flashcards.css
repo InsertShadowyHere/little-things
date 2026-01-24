@@ -1,9 +1,9 @@
 body.flash-correct {
-    animation: flash-correct-bg 300ms;
+    animation: flash-correct-bg 600ms;
 }
 
 body.flash-incorrect {
-    animation: flash-incorrect-bg 300ms;
+    animation: flash-incorrect-bg 600ms;
 }
 
 @keyframes flash-correct-bg {
