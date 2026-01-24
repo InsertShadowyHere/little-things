@@ -8,13 +8,9 @@ const stats = document.getElementById('stats')
 const staff = document.getElementsByName("staff")
 
 let note = new Image();
-note.src = "assets/whole-note.png"
+note.src = "./assets/whole-note.png"
 let grandStaff = new Image();
-grandStaff.src = "assets/grand-staff.png"
-let trebleStaff = new Image();
-trebleStaff.src = "assets/treble-staff.png"
-let bassStaff = new Image();
-bassStaff.src = "assets/bass-staff.png"
+grandStaff.src = "./assets/grand-staff.png"
 
 let notes = "FGABCDEFGABDEFGABCDEFG"
 let current = ""
