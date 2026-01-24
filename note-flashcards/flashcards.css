@@ -1,3 +1,23 @@
+body.flash-correct {
+    animation: flash-correct-bg 300ms;
+}
+
+body.flash-incorrect {
+    animation: flash-incorrect-bg 300ms;
+}
+
+@keyframes flash-correct-bg {
+    0% { background: #f0f0f0; }
+    50% { background: #b6fcb6; }
+    100% { background: #f0f0f0; }
+}
+
+@keyframes flash-incorrect-bg {
+    0% { background: #f0f0f0; }
+    50% { background: #ffb6b6; }
+    100% { background: #f0f0f0; }
+}
+
 #buttons button {
     width: 64px;
     height: 64px;
