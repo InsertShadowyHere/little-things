@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Guesser Flashcards</title>
+    <link rel="stylesheet" href="flashcards.css">
+</head>
+<body>
+    <!-- Goals of this project:
+     show grand staff/bass clef/treble clef
+     show random notes on it
+     show buttons to guess the note
+     keep track of correct things
+     keep track of shown staves -->
+    <div class="canvas-stack">
+        <canvas id="staffCv" width="332" height="359"></canvas>
+        <canvas id="notesCv" width="332" height="359"></canvas>
+    </div>
+    <div id="buttons">
+        <button id="next", onclick="check('A'); newNote();">A</button>
+        <button id="next", onclick="check('B'); newNote();">B</button>
+        <button id="next", onclick="check('C'); newNote();">C</button><br>
+        <button id="next", onclick="check('D'); newNote();">D</button>
+        <button id="next", onclick="check('E'); newNote();">E</button>
+        <button id="next", onclick="check('F'); newNote();">F</button><br>
+        <button id="next", onclick="check('G'); newNote();">G</button>
+    </div>
+    
+    <div id="stats">No stats yet!</div>
+    <!-- <label><input type="radio" name="staff" value="0">Grand Staff</label>
+    <label><input type="radio" name="staff" value="1">Treble</label>
+    <label><input type="radio" name="staff" value="2">Bass</label> -->
+    <script src="flashcards.js"></script>
+</body>
+</html>
+
