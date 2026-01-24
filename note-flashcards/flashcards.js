@@ -17,6 +17,8 @@ let current = ""
 let completed = 0;
 let correct = 0;
 let staves = 0;
+let wrongs = [];
+let wrongTime = 10;
 
 function check(letter) {
     completed += 1;
@@ -26,6 +28,16 @@ function check(letter) {
         bodyElem.classList.remove('flash-incorrect');
         bodyElem.classList.add('flash-correct');
     } else {
+        let alreadyWrong = 0;
+        wrongs.forEach((item) => {
+            if (item[0] === current) {
+                item[1] = wrongTime
+                alreadyWrong = 1;
+            }
+        })
+        if (alreadyWrong === 0) {
+            wrongs.push([current, wrongTime])
+        }
         bodyElem.classList.remove('flash-correct');
         bodyElem.classList.add('flash-incorrect');
     }
@@ -37,6 +49,7 @@ function check(letter) {
 
 function changeStaves() {
     const old = staves;
+    wrongs = [];
     staves = parseInt(document.querySelector('input[name="staff"]:checked').value);
     sctx.clearRect(0, 0, 332, 359)
     sctx.drawImage(grandStaff, 0, 0, 332, 359)
@@ -76,7 +89,16 @@ function newNote() {
     else if (staves === 2) {
         current = Math.floor(11 * Math.random());
     }
-    
+    for (let i = 0; i<wrongs.length; i++) {
+        if (0.2 > Math.random()) {
+            current = wrongs[i][0]
+        }
+        
+        wrongs[i][1] -= 1
+        if (wrongs[i][1] <= 0) {
+            wrongs.splice(i, 1)
+        }
+    }    
     let height = 0;
     if (0 <= current && current <= 10) {
         height = 329 - (current) * 10.5
