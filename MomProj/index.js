@@ -109,6 +109,10 @@ function makeVoiceListItem(v) {
         <input type="checkbox" onchange="redrawVoices()">
     `;
     voicesList.appendChild(e);
+    e.querySelector('.delete-voice').onclick = function() {
+        e.remove();
+        redrawVoices();
+    };
 }
 
 function redrawVoices() {
