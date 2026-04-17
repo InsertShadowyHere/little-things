@@ -1,0 +1,30 @@
+.wrapper {
+    position: relative;
+    width: 3400px;
+    height: 800px;
+}
+
+.wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.main-layout {
+    display: flex;
+    align-items: flex-start;
+}
+
+.voices-list {
+    width: 150px;
+    margin-right: 20px;
+    font-family: sans-serif;
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    padding: 10px;
+    min-height: 800px; /* match canvas height */
+}
+
+.voice {
+    width: 140px;
+}
