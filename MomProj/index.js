@@ -317,9 +317,11 @@ function setCircle() {
 
 function setBarCt() {
     const barlineWidth = parseInt(barlNum.value) * qWidth * lengths[barlType.value]
-    wrapper.width = barlineWidth * barCt.value
-    cv.width = barlineWidth * barCt.value
-    bcv.width = cv.width
+    const newWidth = barlineWidth * barCt.value * scale;
+    cv.width = newWidth;
+    bcv.width = newWidth;
+    cv.style.width = ""; // or set to e.g. "2400px" for a fixed view
+    bcv.style.width = "";
     toggle()
     redrawVoices()
 }
