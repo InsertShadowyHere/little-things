@@ -191,7 +191,7 @@ function calculateKeySig(ksString) {
 function toggle() {
     bctx.clearRect(0, 0, bcv.width, bcv.height)
     if (togC.checked) {
-        bctx.lineWidth = 3;
+        bctx.lineWidth = 5;
         bctx.beginPath();
         bctx.moveTo(0, cv.height/2);
         bctx.lineTo(cv.width, cv.height/2);
@@ -199,7 +199,7 @@ function toggle() {
     }
     if (togBarl.checked) {
         const barlineWidth = parseInt(barlNum.value) * qWidth * lengths[barlType.value]
-        bctx.lineWidth = 2;
+        bctx.lineWidth = 4;
         bctx.font = String(18 * scale) + "px Arial";
         bctx.fillStyle = "black";
         let barNumber = parseInt(barNum.value);
@@ -214,7 +214,7 @@ function toggle() {
         }
     }
     if (togNotes.checked) {
-        bctx.lineWidth = 1;
+        bctx.lineWidth = 3;
         for (let i = 20*scale; i<=cv.height; i+=20*scale) {
             bctx.beginPath();
             bctx.moveTo(0, i);
