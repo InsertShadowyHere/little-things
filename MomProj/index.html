@@ -4,17 +4,23 @@
     <title>Music Thingy</title>
 </head>
 <body>
+    <button onclick="load()">Load</button>
     <input type="file" id="imp">
-    <br><button onclick="load()">Load</button>
-    Show Middle C: <input id="togC" onclick="toggle('C')" type="checkbox">
-    Show Barlines: <input id="togBarl" onclick="toggle('barlines')" type="checkbox">
-    Show All Notes: <input id="togNotes" onclick="toggle('notes')" type="checkbox">
+    <br>
+    Show Middle C: <input id="togC" checked onclick="toggle('C')" type="checkbox">
+    Show Barlines: <input id="togBarl" checked onclick="toggle('barlines')" type="checkbox">
+    Show All Notes: <input id="togNotes" checked onclick="toggle('notes')" type="checkbox">
     Show Outline: <input id="togOut" onclick="toggle('outline')" type="checkbox">
+    <br>
+    Circle-sized Note: <select id="circleNote" onchange="setCircle()"></select> 
+    Bar Length: <input onchange="toggle()" type="number" class="num-inp" min="1" max="12" value="4" id="barlNum"> <select onchange="toggle()" id="barlType"></select> 
+    First Measure Number: <input id='barNum' value="1" type="number" min="1" class="num-inp" onchange="toggle()">
+    Bars: <input id='barCt' value="30" type="number" min="1" class="num-inp" onchange="setBarCt()">
     <div class='main-layout'>
         <div class="voices-list">
 
         </div>
-        <div class="wrapper">
+        <div class="wrapper" id="wrapper">
             <canvas id="bcv"></canvas>
             <canvas id="cv"></canvas>
         </div>
@@ -24,3 +30,27 @@
      <div></div>
     <script src="index.js"></script>
 </body>
+
+<!-- to fix:
+DONE - 1 if something starts with "pitch" or "Pitch" ignore that row
+    added if statement before parsing notes to block
+DONE 5 fix having blank lines
+    added regex if statements to block blank or all-comma lines
+DONE 14 make voices automatically load in toggled on
+DONE 6 make key signatures work for high notes
+    fixed problem where naturals would still trigger key sig, somehow fixed?
+DONE 10 set customizable bar length with bar numbers
+
+DONE 12 dropdown to decide what note appears as a circle
+DONE 11 set customizable first bar number
+DONE 4 support imports directly from google sheets
+    sheets works, excel cant cus no subscription
+DONE 15 add custom length of music
+
+
+EXPORT STUFF:
+7 increase resolution
+8 fix export by width
+3 make bcv further out by 5 px
+13 fix anti aliasing
+-->

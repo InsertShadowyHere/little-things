@@ -1,6 +1,6 @@
 .wrapper {
     position: relative;
-    width: 3400px;
+    width: 2400px;
     height: 800px;
 }
 
@@ -8,6 +8,10 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+
+.num-inp {
+    width: 37px;
 }
 
 .main-layout {

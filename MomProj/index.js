@@ -1,17 +1,33 @@
 const ctx = cv.getContext("2d");
 const bctx = bcv.getContext("2d");
 cv.height = 800
-cv.width = 3400
+cv.width = 2400
 bcv.height = cv.height
 bcv.width = cv.width
 
-let qWidth = 25
+ctx.font = 'bold 12px Arial';
+ctx.fillStyle = 'black';
+ctx.textAlign = 'left';
+
+let qWidth = 20
+const margin = 5;
 
 const letters = { "C": 4, "D": 6, "E": 8, "F": 9, "G": 11, "A": 13, "B": 15 }
 
 const accidentals = {"n": 0, "": 0, "#": 1, "##": 2, "b": -1, "bb": -2, "ff": -2, "f": -1, "ss": 2, "s": 1 }
 
 const lengths = { "q": 1, "e": 1/2, "s": 1/4, "t": 1/8, "h": 2, "w": 4}
+const noteTypes = { "Whole": "w", "Half": "h", "Quarter": "q", "Eighth": "e", "Sixteenth": "s", "Thirty-Second": "t" }
+const noteTypeList = ["Whole", "Half", "Quarter", "Eighth", "Sixteenth", "Thirty-Second"]
+noteTypeList.forEach(noteType => {
+    barlType.add(new Option(noteType, noteTypes[noteType]));
+});
+barlType.value = "q"
+noteTypeList.forEach(noteType => {
+    circleNote.add(new Option(noteType, noteTypes[noteType]));
+});
+circleNote.value = "q"
+
 
 class Note {
     constructor(pitch, length) {
@@ -23,7 +39,9 @@ class Note {
         if (!this.pitch) {
             return;
         }
-        drawEllipse(x, this.pitch, this.length)
+        console.log(this.length)
+        console.log(qWidth)
+        drawEllipse(x, this.pitch, qWidth * this.length)
     }
 }
 
@@ -40,7 +58,7 @@ class Voice {
         let x = 0;
         for (let i = 0; i<this.notes.length; i++) {
             this.notes[i].draw(x)
-            x += this.notes[i].length
+            x += qWidth * this.notes[i].length
         }
     }
 }
@@ -68,15 +86,32 @@ function parseLoad(text) {
 
     // parse data within file
     for (let i = 0; i<text.length; i++) {
+        // line sets key signature
         if (text[i].includes("KS-")) {
-            calculateKeySig(text[i].slice(3))
+            calculateKeySig(text[i].slice(3, 5))
         }
+        // line sets time signature
         else if (text[i].includes("TS-")) {
+        }
+        // if line is a header line
+        else if (text[i].includes("Pitch") || text[i].includes("pitch")) {
+            // skip this
+        }
+        else if (/^[,\s]*$/.test(text[i])) {
+            // Line is empty or only commas/whitespace
         }
         else {
             // template x[i] = A3, #, Q
             const line = text[i].split(",")
-            const noteLength = calculateLength(line[2], curr_ts)
+            console.log(line[2])
+            console.log(line[2][0])
+            const noteLength = lengths[line[2][0]]
+            console.log("note length:", noteLength)
+            if (line[2].length >= 1) {
+                let specialLength = line[2].slice(1)
+                if (specialLength.includes(".")) { noteLength *= 1.5; }
+                if (specialLength.includes("t")) { noteLength *= 2/3; }
+            }
             let pitch = ""
             if (line[0] !== "") {
                 pitch = calculatePitch(line[0], line[1])
@@ -106,9 +141,10 @@ function makeVoiceListItem(v) {
         <div>Voice ${num+1}</div>
         <input onchange="redrawVoices()" type="color" id="colorPicker" name="colorPicker" value="#ff0000">
         <button class="delete-voice">&#128465;</button>
-        <input type="checkbox" onchange="redrawVoices()">
+        <input checked type="checkbox" onchange="redrawVoices()">
     `;
     voicesList.appendChild(e);
+    redrawVoices()
     e.querySelector('.delete-voice').onclick = function() {
         e.remove();
         redrawVoices();
@@ -160,17 +196,28 @@ function toggle() {
         bctx.stroke();
     }
     if (togBarl.checked) {
+        const barlineWidth = parseInt(barlNum.value) * qWidth * lengths[barlType.value]
         bctx.lineWidth = 2;
-        for (let i = 0; i<=cv.width; i+=100) {
+        bctx.font = "18px Arial";
+        bctx.fillStyle = "black";
+        let barNumber = parseInt(barNum.value);
+        bctx.textAlign = "left";
+        for (let i = 0; i<=cv.width; i+=barlineWidth) {
             bctx.beginPath();
-            bctx.moveTo(i, 0);
+            bctx.moveTo(i, 20);
             bctx.lineTo(i, cv.height);
             bctx.stroke();
+            bctx.fillText(barNumber, i, 18);
+            barNumber += 1;
+            
+            // draw text
+            
+            
         }
     }
     if (togNotes.checked) {
         bctx.lineWidth = 1;
-        for (let i = 0; i<=cv.height; i+=20) {
+        for (let i = 20; i<=cv.height; i+=20) {
             bctx.beginPath();
             bctx.moveTo(0, i);
             bctx.lineTo(cv.width, i);
@@ -227,17 +274,17 @@ function calculatePitch(note, accidental) {
     // given A2, # or B3, b, find the number on the table that calculates to it
     let letter_num = letters[note[0]]
     let acc_num = accidentals[accidental]
-    if (acc_num === 0) {
+    if (accidental === "") {
         acc_num = curr_ks[note[0]] || 0;
     }
-    let pitch = parseInt(note[1])
+    let octave = parseInt(note.slice(1))
 
     // calculate key signature notes
     
-    return (pitch-1)*12 + letter_num + acc_num
+    return (octave-1)*12 + letter_num + acc_num
 }
 
-function calculateLength(l, ts) {
+function calculateLength(l) {
     if (l.length >= 1) {
         let finalLength = qWidth * lengths[l[0]]
         if (l[1] === ".") {
@@ -264,4 +311,20 @@ function drawEllipse(x, pitch, length) {
     ctx.fill()
 }
 
+function setCircle() {
+    qWidth = 20 / lengths[circleNote.value]
+    redrawVoices();
+    toggle();
+}
+
+function setBarCt() {
+    const barlineWidth = parseInt(barlNum.value) * qWidth * lengths[barlType.value]
+    wrapper.width = barlineWidth * barCt.value
+    cv.width = barlineWidth * barCt.value
+    bcv.width = cv.width
+    toggle()
+    redrawVoices()
+}
+
 toggle();
+redrawVoices();
