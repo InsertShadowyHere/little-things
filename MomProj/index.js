@@ -1,14 +1,21 @@
 const ctx = cv.getContext("2d");
 const bctx = bcv.getContext("2d");
-cv.height = 800
-cv.width = 2400
+const scale = 4
+cv.height = 800 * scale
+cv.width = 2400 * scale
 bcv.height = cv.height
 bcv.width = cv.width
+cv.style.height = "800px";
+cv.style.width = "2400px";
+bcv.style.height = cv.style.height;
+bcv.style.width = cv.style.width;
+
 
 ctx.font = 'bold 12px Arial';
 ctx.fillStyle = 'black';
 ctx.textAlign = 'left';
 
+let maxVoiceWidth = 0;
 let qWidth = 20
 const margin = 5;
 
@@ -39,8 +46,6 @@ class Note {
         if (!this.pitch) {
             return;
         }
-        console.log(this.length)
-        console.log(qWidth)
         drawEllipse(x, this.pitch, qWidth * this.length)
     }
 }
@@ -58,8 +63,9 @@ class Voice {
         let x = 0;
         for (let i = 0; i<this.notes.length; i++) {
             this.notes[i].draw(x)
-            x += qWidth * this.notes[i].length
+            x += qWidth * this.notes[i].length * scale
         }
+        maxVoiceWidth = Math.max(x, maxVoiceWidth)
     }
 }
 
@@ -103,10 +109,7 @@ function parseLoad(text) {
         else {
             // template x[i] = A3, #, Q
             const line = text[i].split(",")
-            console.log(line[2])
-            console.log(line[2][0])
-            const noteLength = lengths[line[2][0]]
-            console.log("note length:", noteLength)
+            let noteLength = lengths[line[2][0]]
             if (line[2].length >= 1) {
                 let specialLength = line[2].slice(1)
                 if (specialLength.includes(".")) { noteLength *= 1.5; }
@@ -152,6 +155,7 @@ function makeVoiceListItem(v) {
 }
 
 function redrawVoices() {
+    maxVoiceWidth = 0;
     ctx.clearRect(0, 0, cv.width, cv.height)
     const voicesList = document.querySelector('.voices-list');
     const voiceDivs = voicesList.querySelectorAll('.voice');
@@ -164,11 +168,9 @@ function redrawVoices() {
             div.voice.draw()
         }
     });
-    return toggledVoices;
 }
 
 function calculateKeySig(ksString) {
-    console.log("calculating key signature with ksstring of ", ksString)
     const sharpOrder = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
     const flatOrder = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
     curr_ks = {};
@@ -198,26 +200,22 @@ function toggle() {
     if (togBarl.checked) {
         const barlineWidth = parseInt(barlNum.value) * qWidth * lengths[barlType.value]
         bctx.lineWidth = 2;
-        bctx.font = "18px Arial";
+        bctx.font = String(18 * scale) + "px Arial";
         bctx.fillStyle = "black";
         let barNumber = parseInt(barNum.value);
         bctx.textAlign = "left";
-        for (let i = 0; i<=cv.width; i+=barlineWidth) {
+        for (let i = 0; i<=cv.width; i+=barlineWidth*scale) {
             bctx.beginPath();
-            bctx.moveTo(i, 20);
+            bctx.moveTo(i, 20*scale);
             bctx.lineTo(i, cv.height);
             bctx.stroke();
-            bctx.fillText(barNumber, i, 18);
+            bctx.fillText(barNumber, i, 18*scale);
             barNumber += 1;
-            
-            // draw text
-            
-            
         }
     }
     if (togNotes.checked) {
         bctx.lineWidth = 1;
-        for (let i = 20; i<=cv.height; i+=20) {
+        for (let i = 20*scale; i<=cv.height; i+=20*scale) {
             bctx.beginPath();
             bctx.moveTo(0, i);
             bctx.lineTo(cv.width, i);
@@ -247,14 +245,14 @@ function exportImg() {
         if (x > maxX) maxX = x;
     });
 
-    // draw double canvas
+    // draw double canvas (padded!)
     const offscreenCV = document.createElement('canvas')
-    offscreenCV.width = cv.width
-    offscreenCV.height = cv.height
+    offscreenCV.width = cv.width + 10
+    offscreenCV.height = cv.height + 10
     const octx = offscreenCV.getContext('2d')
 
-    octx.drawImage(cv, 0, 0, maxX, cv.height, 0, 0, maxX, cv.height);
-    octx.drawImage(bcv, 0, 0, maxX, bcv.height, 0, 0, maxX, bcv.height);
+    octx.drawImage(cv, 5, 5);
+    octx.drawImage(bcv, 5, 5);
 
     const link = document.createElement('a');
     link.href = offscreenCV.toDataURL();
@@ -307,7 +305,7 @@ function calculateLength(l) {
 function drawEllipse(x, pitch, length) {
     // ctx.ellipse(x, y, rx, ry, rotation, 0, 2 * Math.PI);
     ctx.beginPath()
-    ctx.ellipse(x + length/2, cv.height - pitch*10, length/2, 10, 0, 0, 2 * Math.PI);
+    ctx.ellipse(x + (length/2)*scale, cv.height - (pitch*10)*scale, (length/2)*scale, 10*scale, 0, 0, 2 * Math.PI);
     ctx.fill()
 }
 
