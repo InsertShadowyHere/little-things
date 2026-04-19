@@ -69,9 +69,8 @@ class Voice {
     }
 }
 
-const voices = []
+const voices = [];
 
-let curr_ks = {}
 let curr_ts = 4;
 
 
@@ -89,12 +88,13 @@ function parseLoad(text) {
     const v = new Voice();
     let pmin = 0;
     let pmax = 100;
+    let currKS = {};
 
     // parse data within file
     for (let i = 0; i<text.length; i++) {
         // line sets key signature
         if (text[i].includes("KS-")) {
-            calculateKeySig(text[i].slice(3, 5))
+            currKS = calculateKeySig(text[i].slice(3, 5))
         }
         // line sets time signature
         else if (text[i].includes("TS-")) {
@@ -117,7 +117,7 @@ function parseLoad(text) {
             }
             let pitch = ""
             if (line[0] !== "") {
-                pitch = calculatePitch(line[0], line[1])
+                pitch = calculatePitch(line[0], line[1], currKS)
                 if (pitch < pmin) {
                     pmin = pitch;
                 }
@@ -173,19 +173,20 @@ function redrawVoices() {
 function calculateKeySig(ksString) {
     const sharpOrder = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
     const flatOrder = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
-    curr_ks = {};
+    let currKS = {};
 
     if (ksString.endsWith('b')) {
         const count = parseInt(ksString);
         for (let i = 0; i < count; i++) {
-            curr_ks[flatOrder[i]] = -1;
+            currKS[flatOrder[i]] = -1;
         }
     } else if (ksString.endsWith('#')) {
         const count = parseInt(ksString);
         for (let i = 0; i < count; i++) {
-            curr_ks[sharpOrder[i]] = 1;
+            currKS[sharpOrder[i]] = 1;
         }
     }
+    return currKS
 }
 
 function toggle() {
@@ -268,12 +269,12 @@ calculatePitch("B3", "##")
 Used to get the number on the table of each pitch
 
 */
-function calculatePitch(note, accidental) {
+function calculatePitch(note, accidental, currKS) {
     // given A2, # or B3, b, find the number on the table that calculates to it
     let letter_num = letters[note[0]]
     let acc_num = accidentals[accidental]
     if (accidental === "") {
-        acc_num = curr_ks[note[0]] || 0;
+        acc_num = currKS[note[0]] || 0;
     }
     let octave = parseInt(note.slice(1))
 
