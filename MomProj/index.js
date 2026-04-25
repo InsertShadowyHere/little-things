@@ -10,6 +10,7 @@ cv.style.width = "2400px";
 bcv.style.height = cv.style.height;
 bcv.style.width = cv.style.width;
 
+const STACCATO_MODIFIER = 0.86
 
 ctx.font = 'bold 12px Arial';
 ctx.fillStyle = 'black';
@@ -35,24 +36,62 @@ noteTypeList.forEach(noteType => {
 });
 circleNote.value = "q"
 
+let slurStart = null;
 
 class Note {
-    constructor(pitch, length) {
+    constructor(pitch, length, nextSlurred) {
         this.pitch = pitch;
         this.length = length;
         this.extraPitch = null;
         this.extraLength = null;
-
+        this.nextSlurred = nextSlurred;
+        this.staccato = false;
+        this.opacity = 1;
     }
 
-    draw(x) {
+    draw(x, baseColor, overallOpacity, opacityOff, staccatoOff, slursOff) {
         if (!this.pitch) {
             return;
         }
-        drawEllipse(x, this.pitch, qWidth * this.length)
-        if (this.extraPitch) {
-            drawEllipse(x, this.extraPitch, qWidth * this.extraLength)
+        const r = parseInt(baseColor.slice(1, 3), 16);
+        const g = parseInt(baseColor.slice(3, 5), 16);
+        const b = parseInt(baseColor.slice(5, 7), 16);
+        let finalAlpha = overallOpacity * this.opacity;
+        if (opacityOff) {
+            finalAlpha = overallOpacity;
         }
+        ctx.fillStyle = `rgba(${r},${g},${b},${finalAlpha})`;
+
+        let staccatoLength = 1;
+        if (this.staccato && !staccatoOff) {
+            staccatoLength = STACCATO_MODIFIER
+        }
+
+
+        drawEllipse(x, this.pitch, qWidth * this.length * staccatoLength);
+        if (this.extraPitch) {
+            drawEllipse(x, this.extraPitch, qWidth * this.extraLength * staccatoLength)
+        }
+
+        ctx.strokeStyle = ctx.fillStyle
+        ctx.lineWidth = scale * 3;
+        ctx.lineCap = "round";
+
+        if (slurStart) {
+            ctx.beginPath();
+            ctx.moveTo(...slurStart);
+            ctx.lineTo(x + 0.1*(qWidth * this.length * staccatoLength)*scale, cv.height - (this.pitch*10)*scale);
+            ctx.stroke();
+            slurStart = null;
+        }
+
+        if (this.nextSlurred && !slursOff) {
+            slurStart = [x + 0.9*(qWidth * this.length * staccatoLength)*scale, cv.height - (this.pitch*10)*scale]
+            console.log(slurStart)
+            console.log(this.length, scale)
+        }
+
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${overallOpacity})`
     }
 }
 
@@ -60,13 +99,16 @@ class Voice {
     constructor() {
         this.notes = [];
         this.color = "";
+        this.opacity = 1;
+        this.opacityOff = false;
+        this.staccatoOff = false;
+        this.slursOff = false;
     }
 
     draw() {
-        ctx.fillStyle = this.color;
         let x = 0;
         for (let i = 0; i<this.notes.length; i++) {
-            this.notes[i].draw(x)
+            this.notes[i].draw(x, this.color, this.opacity, this.opacityOff, this.staccatoOff, this.slursOff)
             x += qWidth * this.notes[i].length * scale
         }
         maxVoiceWidth = Math.max(x, maxVoiceWidth)
@@ -111,7 +153,8 @@ function parseLoad(text) {
             // Line is empty or only commas/whitespace
         }
         else {
-            // template x[i] = A3, #, Q
+            //                  0  1  2  3  4         5      6       7       8
+            // template x[i] = A3, #, Q, ?, NOTE 2, NOTE 2, NOTE 2, slur, stacatto
             const line = text[i].split(",")
             let noteLength = lengths[line[2][0]]
             if (line[2].length >= 1) {
@@ -124,8 +167,11 @@ function parseLoad(text) {
                 pitch = calculatePitch(line[0], line[1], currKS)
             }
             const n = new Note(pitch, noteLength);
+            n.nextSlurred = Boolean(line[7]) || false;
+            n.staccato = Boolean(line[8]) || false;
+            n.opacity = parseInt(line[9]) / 100 || 1;
 
-            // extra notes
+            // extra notesx
             if (line.length >= 7) {
                 let extraLength = lengths[line[6][0]]
                 if (line[6].length >= 1) {
@@ -139,7 +185,6 @@ function parseLoad(text) {
                 }
                 n.extraLength = extraLength;
                 n.extraPitch = extraPitch;
-
             }
             v.notes.push(n)
         }
@@ -155,13 +200,20 @@ function makeVoiceListItem(v) {
     e.className = "voice";
     e.voice = v
     e.innerHTML = `
-        <input style='width: 70px' value='Voice ${num+1}'>
-        <input onchange="redrawVoices()" type="color" id="colorPicker" name="colorPicker" value="#ff0000">
+    <div class='voice-box'>
+        <input style='width: 80px' class="name" value='Voice ${num+1}'>
+        <input onchange="redrawVoices()" type="color" style="width: 32px;" value="rgba(255, 0, 0, 1)">
         <button class="delete-voice">&#128465;</button>
-        <input checked type="checkbox" onchange="redrawVoices()">
-    `;
+        <input checked type="checkbox" onchange="redrawVoices()"><br>
+        <label>Voice Opacity: <input onchange="redrawVoices()" type="range" class="opa" min="0" max="100" value="100"></label><br>
+        Note Opacity Off: <input class="ignore-note-opacity" type="checkbox" onchange="redrawVoices()"><br>
+        Staccato Off: <input class="ignore-staccato" type="checkbox" onchange="redrawVoices()"><br>
+        Slurs Off: <input class="ignore-slurs" type="checkbox" onchange="redrawVoices()"><br>
+    </div>
+        `;
     voicesList.appendChild(e);
     redrawVoices()
+    e.querySelector('.sat')
     e.querySelector('.delete-voice').onclick = function() {
         e.remove();
         redrawVoices();
@@ -178,7 +230,19 @@ function redrawVoices() {
         const checkbox = div.querySelector('input[type="checkbox"]');
         if (checkbox.checked) {
             const color = div.querySelector('input[type="color"]');
-            div.voice.color = color.value
+            const opacity = div.querySelector('input[type="range"]');
+            div.voice.opacity = opacity.value/100;
+            div.voice.color = color.value;
+
+            const ignoreNoteOpacity = div.querySelector('.ignore-note-opacity');
+            div.voice.opacityOff = ignoreNoteOpacity && ignoreNoteOpacity.checked;
+            
+            const ignoreStaccato = div.querySelector('.ignore-staccato');
+            div.voice.staccatoOff = ignoreStaccato.checked;
+            
+            const ignoreSlurs = div.querySelector('.ignore-slurs');
+            div.voice.slursOff = ignoreSlurs && ignoreSlurs.checked;
+            
             div.voice.draw()
         }
     });
@@ -206,7 +270,7 @@ function calculateKeySig(ksString) {
 function toggle() {
     bctx.clearRect(0, 0, bcv.width, bcv.height)
     if (togC.checked) {
-        bctx.lineWidth = 5;
+        bctx.lineWidth = 6;
         bctx.beginPath();
         bctx.moveTo(0, cv.height/2);
         bctx.lineTo(cv.width, cv.height/2);
@@ -238,7 +302,7 @@ function toggle() {
         }
     }
     if (togOut.checked) {
-        bctx.lineWidth = 5;
+        bctx.lineWidth = 8;
         bctx.strokeRect(0, 0, cv.width, cv.height)
     }
 }
@@ -271,7 +335,19 @@ function exportImg() {
 
     const link = document.createElement('a');
     link.href = offscreenCV.toDataURL();
-    link.download = 'music-art.png';
+
+    let name = []
+
+    const voicesList = document.querySelector('.voices-list');
+    const voiceDivs = voicesList.querySelectorAll('.voice');
+    voiceDivs.forEach(div => {
+        const checkbox = div.querySelector('input[type="checkbox"]');
+        if (checkbox.checked) {
+            name.push(div.querySelector('.name').value);
+        }
+    });
+
+    link.download = name.join('_');
     link.click();
 }
 
