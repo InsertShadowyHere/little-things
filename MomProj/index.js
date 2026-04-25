@@ -40,6 +40,9 @@ class Note {
     constructor(pitch, length) {
         this.pitch = pitch;
         this.length = length;
+        this.extraPitch = null;
+        this.extraLength = null;
+
     }
 
     draw(x) {
@@ -47,6 +50,9 @@ class Note {
             return;
         }
         drawEllipse(x, this.pitch, qWidth * this.length)
+        if (this.extraPitch) {
+            drawEllipse(x, this.extraPitch, qWidth * this.extraLength)
+        }
     }
 }
 
@@ -54,8 +60,6 @@ class Voice {
     constructor() {
         this.notes = [];
         this.color = "";
-        this.min = 0;
-        this.max = 100;
     }
 
     draw() {
@@ -118,18 +122,28 @@ function parseLoad(text) {
             let pitch = ""
             if (line[0] !== "") {
                 pitch = calculatePitch(line[0], line[1], currKS)
-                if (pitch < pmin) {
-                    pmin = pitch;
-                }
-                if (pitch > pmax) {
-                    pmax = pitch;
-                }
             }
-            v.notes.push(new Note(pitch, noteLength))
+            const n = new Note(pitch, noteLength);
+
+            // extra notes
+            if (line.length >= 7) {
+                let extraLength = lengths[line[6][0]]
+                if (line[6].length >= 1) {
+                    let specialLength = line[6].slice(1)
+                    if (specialLength.includes(".")) { extraLength *= 1.5; }
+                    if (specialLength.includes("t")) { extraLength *= 2/3; }
+                }
+                let extraPitch = ""
+                if (line[4] !== "") {
+                    extraPitch = calculatePitch(line[4], line[5], currKS)
+                }
+                n.extraLength = extraLength;
+                n.extraPitch = extraPitch;
+
+            }
+            v.notes.push(n)
         }
     }
-    v.min = pmin;
-    v.max = pmax;
     voices.push(v)
     makeVoiceListItem(v)
 }
@@ -141,7 +155,7 @@ function makeVoiceListItem(v) {
     e.className = "voice";
     e.voice = v
     e.innerHTML = `
-        <div>Voice ${num+1}</div>
+        <input style='width: 70px' value='Voice ${num+1}'>
         <input onchange="redrawVoices()" type="color" id="colorPicker" name="colorPicker" value="#ff0000">
         <button class="delete-voice">&#128465;</button>
         <input checked type="checkbox" onchange="redrawVoices()">
