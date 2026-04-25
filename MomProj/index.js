@@ -155,7 +155,7 @@ function makeVoiceListItem(v) {
     e.className = "voice";
     e.voice = v
     e.innerHTML = `
-        <input style='width: 70px' value='Voice ${num+1}'>
+        <input style='width: 80px' value='Voice ${num+1}'>
         <input onchange="redrawVoices()" type="color" id="colorPicker" name="colorPicker" value="#ff0000">
         <button class="delete-voice">&#128465;</button>
         <input checked type="checkbox" onchange="redrawVoices()">
