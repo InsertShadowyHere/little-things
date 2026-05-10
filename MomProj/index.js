@@ -200,6 +200,7 @@ function makeVoiceListItem(v) {
     e.className = "voice";
     e.voice = v
     e.innerHTML = `
+    <div class="voice-box">
         <input style='width: 70px' value='Voice ${num+1}'>
         <input onchange="redrawVoices()" type="color" id="colorPicker" name="colorPicker" value="#ff0000">
         <button class="delete-voice">&#128465;</button>
